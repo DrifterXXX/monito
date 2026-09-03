@@ -2,31 +2,68 @@
   <img src="docs/marketing/monito-devto-cover.png" alt="monito banner" width="640">
 </p>
 
-<h1 align="center">monito — API Health Check Monitoring</h1>
+<h1 align="center">monito — API 健康检查监控 | API Health Check Monitoring</h1>
 
 <p align="center">
-  <strong>Multi-tenant API health checks on Cloudflare Workers — $0/mo infrastructure cost.</strong>
+  <strong>基于 Cloudflare Workers 的多租户 API 健康检查——每月 $0 基础设施成本。<br>
+  Multi-tenant API health checks on Cloudflare Workers — $0/mo infrastructure cost.</strong>
 </p>
 
 <p align="center">
-  <a href="#features">Features</a> •
+  <a href="#功能--features">中文</a> •
+  <a href="#overview">English</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#architecture">Architecture</a> •
   <a href="#cli">CLI</a> •
   <a href="#api-documentation">API</a> •
-  <a href="#deployment">Deploy</a> •
-  <a href="#limitations">Limitations</a>
-</p>
-
-<p align="center">
-  <a href="https://monito.yycomyy.workers.dev">Product Page</a> •
-  <a href="https://monito-5sy.pages.dev">Live Status</a> •
-  <a href="https://monito.yycomyy.workers.dev/blog">Blog Post</a>
+  <a href="#deployment">Deploy</a>
 </p>
 
 ---
 
+## 功能 | Features
+
+**monito** 是一个开源多租户 API 健康检查监控服务，完全运行在 **Cloudflare 免费层**上——Workers、D1（边缘 SQLite）、KV 和 Pages。零基础设施管理，零服务器成本。
+
+它每 1-5 分钟检查你的 API 端点，跟踪滚动窗口正常运行时间（24h / 7d / 30d），服务宕机时通过邮件告警，并提供公开状态仪表盘——所有基础设施成本 **$0/月**。
+
+**monito** is an open-source, multi-tenant API health check monitoring service that runs entirely on **Cloudflare's free tier** — Workers, D1 (SQLite on edge), KV, and Pages. Zero infrastructure to manage, zero server cost.
+
+| 功能 Feature | 说明 Description |
+|---|---|
+| **分钟级检查 Minute-level checks** | 每个监控端点每分钟检查一次 Every endpoint checked once per minute |
+| **多租户隔离 Multi-tenant isolation** | SHA-256 API 密钥哈希，原始密钥永不持久化 Raw keys never persisted |
+| **滚动正常运行时间 Rolling uptime** | 24小时/7天/30天窗口，实时计算 24h/7d/30d windows, calculated live |
+| **邮件告警 Email alerts** | 宕机+恢复通知（via Resend），可配置冷却防疲劳 Down + recovery with cooldown |
+| **公开状态页 Public status page** | Cloudflare Pages 仪表盘，实时状态指示器 Real-time status indicators |
+| **CLI 工具** | 终端管理监控项，单 Node.js 文件零外部依赖 Single file, zero deps |
+| **REST API** | 监控项完整 CRUD、状态查询、等待列表管理 Full CRUD |
+| **边缘部署 Edge-deployed** | Cloudflare Workers + D1，全球边缘网络 Global edge network |
+| **响应波形 Response waveforms** | 状态页可视化延迟趋势 Visualize latency trends |
+
+## 快速开始 | Quick Start
+
+### 方式 A：使用托管版 Use hosted version
+
+访问 Visit [monito.yycomyy.workers.dev](https://monito.yycomyy.workers.dev)
+
+### 方式 B：自托管 Self-host
+
+```bash
+git clone https://github.com/DrifterXXX/monito.git && cd monito
+npm install
+wrangler d1 create monito-db        # → 粘贴 database ID 到 wrangler.toml
+wrangler kv namespace create monito-state
+wrangler d1 migrations apply monito-db --remote
+wrangler deploy
+wrangler secret put MONITO_API_KEY  # openssl rand -hex 32
+wrangler secret put RESEND_API_KEY
+```
+
+---
+
 ## Overview
+
 
 **monito** is an open-source, multi-tenant API health check monitoring service that runs entirely on **Cloudflare's free tier** — Workers, D1 (SQLite on edge), KV, and Pages. Zero infrastructure to manage, zero server cost.
 
